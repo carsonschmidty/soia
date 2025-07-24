@@ -7,13 +7,17 @@ def save_pdf(url, filename):
     token = os.environ["SLACK_BOT_TOKEN"]
     headers = {"Authorization": f"Bearer {token}"}
     today = datetime.today().strftime("%Y-%m-%d")
-    os.makedirs(f"pdfs/{today}", exist_ok=True)
+    save_dir = f"pdfs/{today}"
+    os.makedirs(save_dir, exist_ok=True)
+    full_path = f"{save_dir}/{filename}"
 
-    res = requests.get(url, headers=headers, verify=certifi.where())
-
+    res = requests.get(url, headers=headers)
     if res.status_code == 200:
-        with open(f"pdfs/{today}/{filename}", "wb") as f:
+        with open(full_path, "wb") as f:
             f.write(res.content)
         print(f"Saved: {filename}")
+        return full_path  # ✅ return this
     else:
         print(f"Failed to download: {filename}")
+        return None
+
